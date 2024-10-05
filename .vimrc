@@ -1,4 +1,8 @@
-silent! colorscheme gruber
+if has("mouse_sgr")
+  set ttymouse=sgr
+else
+  set ttymouse=xterm2
+end
 
 if has('win32')
   set guifont=Consolas:h14
@@ -11,11 +15,6 @@ endif
 if has('macvim')
   set macmeta
 endif
-
-" works for MacOS Terminal.app
-" let &t_SI.="\e[5 q" "SI = INSERT mode
-" let &t_SR.="\e[4 q" "SR = REPLACE mode
-" let &t_EI.="\e[1 q" "EI = NORMAL mode (ELSE)
 
 set colorcolumn=80
 
@@ -73,7 +72,6 @@ set tags=./tags;,tags
 set ttyfast
 set viminfo+=!
 set lazyredraw
-set scrolloff=1
 set sidescroll=1
 set sidescrolloff=2
 set clipboard=unnamed
@@ -83,7 +81,7 @@ set splitbelow
 
 set wildmenu
 set wildmode=longest:full
-set wildoptions=fuzzy,pum
+" set wildoptions=fuzzy,pum
 set wildignorecase
 set wildignore+=*.o,*.obj,*.bak,*.exe
 set wildignore+=*.pyc
@@ -110,6 +108,11 @@ nnoremap <leader>k :wa<cr>
 nnoremap <leader>m :make<cr>
 autocmd QuickFixCmdPost [^l]* nested cwindow
 autocmd QuickFixCmdPost    l* nested lwindow
+
+nnoremap <c-j> :bn<CR>
+nnoremap <c-k> :bp<CR>
+tnoremap <c-j> <c-w>:bn<CR>
+tnoremap <c-k> <c-w>:bp<CR>
 
 function! UnsetAltScreen()
   let g:altscreen_save_t_ti = &t_ti
@@ -151,12 +154,12 @@ augroup END
 
 silent! noremap <unique> <silent>  <c-z>  :<c-u>call AltScreenControlZ()<cr>
 
-nnoremap <c-n> :bnext<Cr>
-nnoremap <c-p> :bprevious<Cr>
 nnoremap <leader>d :bp\|bd #<CR>
 
+tnoremap <c-\> <c-\><c-n>
+
 " add new line without escaping normal mode and move to it
-nnoremap <leader><cr> :call append(line('.'), '')<cr>j
+nnoremap <cr> :call append(line('.'), '')<cr>j
 
 function! s:Marks(char)
   marks
@@ -178,10 +181,9 @@ nnoremap y` :call <SID>Marks("y`")<CR>
 
 " <NUL> is <C-Space>
 inoremap <NUL> <C-n>
-inoremap <C-n> <DOWN>
-inoremap <C-p> <UP>
 
 inoremap <C-c> <esc>
+vnoremap <C-c> <esc>
 
 " don't undo the whole thing!!
 inoremap , ,<C-g>u
@@ -190,8 +192,8 @@ inoremap ! !<C-g>u
 inoremap ? ?<C-g>u
 
 " add relative jumps to jump point list
-nnoremap <EXPR> k (v:count > 5 > "m'" . v:count : "") . 'k'
-nnoremap <EXPR> j (v:count > 5 > "m'" . v:count : "") . 'j'
+" nnoremap <EXPR> k (v:count > 5 > "m'" . v:count : "") . 'k'
+" nnoremap <EXPR> j (v:count > 5 > "m'" . v:count : "") . 'j'
 
 " ---- https://github.com/tpope/vim-sleuth/blob/master/plugin/sleuth.vim ---- "
 
@@ -991,3 +993,32 @@ else
     augroup END
   endif
 endif
+
+" ---- https://github.com/drzel/vim-scrolloff-fraction ---- "
+
+" vim-scrolloff-fraction
+" Author: Sheldon Johnson
+" Version: 0.2
+
+let g:scrolloff_fraction = 0.35
+
+let g:scrolloff_absolute_filetypes = ['qf']
+
+if !exists('g:scrolloff_absolute_value')
+  let g:scrolloff_absolute_value = 0
+end
+
+function! ScrollOffFraction(fraction)
+  if index(g:scrolloff_absolute_filetypes, &filetype) == -1
+    let l:visible_lines_in_active_window = winheight(win_getid())
+    let &scrolloff = float2nr(l:visible_lines_in_active_window * a:fraction)
+  else
+    let &scrolloff = g:scrolloff_absolute_value
+  endif
+endfunction
+
+augroup ScrolloffFraction
+  autocmd!
+  autocmd BufEnter,WinEnter,WinNew,VimResized *,*.*
+        \ call ScrollOffFraction(g:scrolloff_fraction)
+augroup END

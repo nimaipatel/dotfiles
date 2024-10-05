@@ -11,7 +11,8 @@ precmd() {
 
 setopt prompt_subst
 # prompt='%F{green}%3~${vcs_info_msg_0_} %#%f '
-prompt='%F{green}%3~${vcs_info_msg_0_} ॐ %f '
+prompt='%F{green}%3~${vcs_info_msg_0_}
+ॐ %f '
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
