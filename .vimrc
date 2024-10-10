@@ -1,8 +1,14 @@
-if has("mouse_sgr")
-  set ttymouse=sgr
-else
-  set ttymouse=xterm2
-end
+autocmd VimEnter * :normal :startinsert :stopinsert
+let &t_SI = "\e[6 q"
+let &t_EI = "\e[2 q"
+
+" install copilot using
+" git clone https://github.com/github/copilot.vim.git ~/.vim/pack/nimai/start/copilot.vim
+autocmd VimEnter * Copilot disable
+inoremap <C-]> <Plug>(copilot-next)
+inoremap <C-[> <Plug>(copilot-previous)
+inoremap <C-\> <Plug>(copilot-dismiss)
+inoremap <NUL> <Plug>(copilot-suggest)
 
 if has('win32')
   set guifont=Consolas:h14
@@ -48,6 +54,9 @@ set keywordprg=:Man
 
 set cinoptions=l1
 
+set exrc
+set secure
+
 set smarttab
 set autoindent
 set copyindent
@@ -61,7 +70,7 @@ set encoding=utf-8
 set formatoptions=tcqj
 set history=10000
 set hlsearch
-set incsearch
+" set incsearch
 set langnoremap
 set laststatus=2
 set listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
@@ -102,17 +111,29 @@ vnoremap > >gv
 vnoremap J :m '>+1<cr>gv=gv
 vnoremap K :m '<-2<cr>gv=gv
 
+nnoremap <leader>t :vertical terminal<cr>
+
 nnoremap <c-l> :nohl<cr><c-l>
 
 nnoremap <leader>k :wa<cr>
 nnoremap <leader>m :make<cr>
+let fmtcmd = 'echo "format command not set"'
+nnoremap <leader>f :execute '!' . fmtcmd<CR>
 autocmd QuickFixCmdPost [^l]* nested cwindow
 autocmd QuickFixCmdPost    l* nested lwindow
+
+autocmd FileType text setlocal textwidth=80 spell
 
 nnoremap <c-j> :bn<CR>
 nnoremap <c-k> :bp<CR>
 tnoremap <c-j> <c-w>:bn<CR>
 tnoremap <c-k> <c-w>:bp<CR>
+
+nnoremap <c-n> :cn<CR>
+nnoremap <c-p> :cp<CR>
+
+set grepprg=grep\ -nH\ --column\ --color=auto\ --exclude-dir='{.bzr,CVS,.git,.hg,.svn,.idea,.tox}'
+nnoremap <leader>g :vimgrep '' **/*<left><left><left><left><left><left>
 
 function! UnsetAltScreen()
   let g:altscreen_save_t_ti = &t_ti
@@ -158,9 +179,6 @@ nnoremap <leader>d :bp\|bd #<CR>
 
 tnoremap <c-\> <c-\><c-n>
 
-" add new line without escaping normal mode and move to it
-nnoremap <cr> :call append(line('.'), '')<cr>j
-
 function! s:Marks(char)
   marks
   let s:mark = nr2char(getchar())
@@ -180,7 +198,7 @@ nnoremap y' :call <SID>Marks("y'")<CR>
 nnoremap y` :call <SID>Marks("y`")<CR>
 
 " <NUL> is <C-Space>
-inoremap <NUL> <C-n>
+" inoremap <NUL> <C-n>
 
 inoremap <C-c> <esc>
 vnoremap <C-c> <esc>

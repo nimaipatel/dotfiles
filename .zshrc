@@ -11,8 +11,8 @@ precmd() {
 
 setopt prompt_subst
 # prompt='%F{green}%3~${vcs_info_msg_0_} %#%f '
-prompt='%F{green}%3~${vcs_info_msg_0_}
-ॐ %f '
+prompt='%B%F{green}%n@%m:%4~${vcs_info_msg_0_}
+ॐ  %f%b'
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
@@ -63,4 +63,16 @@ load_nvm() {
     export NVM_DIR="$HOME/.nvm"
     [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
     [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+}
+
+
+echo -e "\e[6 q"
+
+
+function reset_cursor_shape() {
+  echo -ne "\e[6 q"  # Set cursor to a line shape
+}
+
+precmd() {
+  reset_cursor_shape
 }
